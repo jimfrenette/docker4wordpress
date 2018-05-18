@@ -64,27 +64,38 @@ function build {
     # cleanup
     rm -rf $BUILD
 
-    # create build root
-    mkdir $BUILD
+    # docker folders
+    mkdir -p docker/prod
+    mkdir -p docker/stage
 
-    # folders
-    mkdir $BUILD/wp-content
-    mkdir $BUILD/wp-content/themes
+    # build folders
+    mkdir -p $BUILD/wp-content/themes
 
-    cp -r $SRC/wp-content/plugins $BUILD/wp-content/plugins
-    cp -r $SRC/wp-content/themes/$THEME $BUILD/wp-content/themes/$THEME
-    cp -r $SRC/wp-content/uploads $BUILD/wp-content/uploads
+    if [ -d $SRC/wp-content/plugins ]; then
+        cp -r $SRC/wp-content/plugins $BUILD/wp-content/plugins
+    fi
+    if [ -d $SRC/wp-content/themes ]; then
+        cp -r $SRC/wp-content/themes/$THEME $BUILD/wp-content/themes/$THEME
+    fi
+    if [ -d $SRC/wp-content/uploads ]; then
+        cp -r $SRC/wp-content/uploads $BUILD/wp-content/uploads
+    fi
 
     # files
-    cp $SRC/.htaccess $BUILD/.htaccess
+    if [ -e $SRC/.htaccess ]; then
+        cp $SRC/.htaccess $BUILD/.htaccess
+    fi
+
     for i in $SRC/*.html; do cp $i $BUILD; done
     for i in $SRC/*.txt; do cp $i $BUILD; done
     for i in $SRC/*.xml; do cp $i $BUILD; done
 
     ## files (prod)
     # if [ "$env" == "prod" ]; then
-    #     cp $SRC/wp-content/themes/$THEME/footer_prod.php $BUILD/wp-content/themes/$THEME/footer.php
-    #     echo "prod footer cp"
+    #     if [ -e $SRC/wp-content/themes/$THEME/footer_prod.php ]
+    #         cp $SRC/wp-content/themes/$THEME/footer_prod.php $BUILD/wp-content/themes/$THEME/footer.php
+    #         echo "prod footer cp"
+    #     fi
     # fi
 
     # build docker image

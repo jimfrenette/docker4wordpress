@@ -83,25 +83,39 @@ $THEME = "mytheme"
 # cleanup
 Remove-Item .\$BUILD -Force -Recurse
 
-# folders
+# docker folders
+New-Item -ItemType Directory -Force -path docker\prod
+New-Item -ItemType Directory -Force -path docker\stage
+
+# build folders
 New-Item -ItemType Directory -path $BUILD
 New-Item -ItemType Directory -path $BUILD\wp-content
 New-Item -ItemType Directory -path $BUILD\wp-content\themes
 
-Copy-Item -Path $SRC\wp-content\plugins -Recurse -Destination $BUILD\wp-content\plugins
-Copy-Item -Path $SRC\wp-content\themes\$THEME -Recurse -Destination $BUILD\wp-content\themes\$THEME
-Copy-Item -Path $SRC\wp-content\uploads -Recurse -Destination $BUILD\wp-content\uploads
+if ( Test-Path $SRC\wp-content\plugins -PathType Container ) {
+    Copy-Item -Path $SRC\wp-content\plugins -Recurse -Destination $BUILD\wp-content\plugins
+}
+if ( Test-Path $SRC\wp-content\themes\$THEME -PathType Container ) {
+    Copy-Item -Path $SRC\wp-content\themes\$THEME -Recurse -Destination $BUILD\wp-content\themes\$THEME
+}
+if ( Test-Path $SRC\wp-content\uploads -PathType Container ) {
+    Copy-Item -Path $SRC\wp-content\uploads -Recurse -Destination $BUILD\wp-content\uploads
+}
 
-# files
-Copy-Item -Path $SRC\.htaccess -Destination $BUILD\.htaccess
+# build files
+if ( Test-Path $SRC\.htaccess -PathType Leaf ) {
+    Copy-Item -Path $SRC\.htaccess -Destination $BUILD\.htaccess
+}
 Copy-Item -Path $SRC\*.html -Destination $BUILD\
 Copy-Item -Path $SRC\*.txt -Destination $BUILD\
 Copy-Item -Path $SRC\*.xml -Destination $BUILD\
 
 ## files (prod)
 # if ($env -eq 'prod') {
-#    Copy-Item -Path $SRC\wp-content\themes\$THEME\footer_prod.php -Destination $BUILD\wp-content\themes\$THEME\footer.php -Verbose
-#}
+#    if ( Test-Path $SRC\wp-content\themes\$THEME\footer_prod.php -PathType Leaf ) {
+#       Copy-Item -Path $SRC\wp-content\themes\$THEME\footer_prod.php -Destination $BUILD\wp-content\themes\$THEME\footer.php -Verbose
+#    }
+# }
 
 # build docker image
 docker build --squash -f Dockerfile -t $IMAGE .
