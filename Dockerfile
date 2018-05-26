@@ -1,5 +1,5 @@
 ## https://github.com/docker-library/wordpress
-FROM wordpress:4.9.5-php7.2-apache
+FROM wordpress:4.9.6-php7.2-apache
 
 ## PHP extensions
 ## update and uncomment this next line as needed
